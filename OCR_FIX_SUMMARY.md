@@ -35,12 +35,11 @@ User uploads image → Base64 conversion → Data URL prefix removal →
 Validation → Google Vision API → Text extraction → Receipt parsing
 ```
 
-### 2. Fallback Behavior
+### 2. Error Behavior
 If Google Vision API is not available or fails:
-- Returns a structured response with default values
-- Sets vendor to "Manual Entry Required"
-- Provides helpful warning message
-- Allows user to manually enter receipt details
+- Returns proper HTTP error status codes
+- Provides clear error messages about the specific issue
+- Requires Google Vision API to be properly configured for OCR to work
 
 ### 3. Enhanced Receipt Parsing
 - **McDonald's format support**: Specifically handles European McDonald's receipt format
@@ -64,9 +63,9 @@ You need Google Cloud Vision API credentials:
    ```
 
 ### Without Google Vision API
-- OCR will return fallback response
-- Users can still manually enter receipt details
-- Application remains fully functional
+- OCR will return error responses
+- Google Vision API configuration is required for OCR functionality
+- Other parts of the application remain functional
 
 ## Testing the Fix
 
@@ -90,10 +89,11 @@ Initializing Google Vision client...
 
 ## Troubleshooting
 
-### OCR Returns Fallback Response
-- Check Google Cloud Vision API credentials
+### OCR Returns Error
+- Check Google Cloud Vision API credentials are properly configured
 - Verify billing is enabled on Google Cloud project
 - Check API quotas and limits
+- Ensure environment variables are set correctly
 
 ### Image Upload Fails
 - Ensure image is valid format (JPEG, PNG)
@@ -107,10 +107,10 @@ Initializing Google Vision client...
 
 ## Benefits of the Fix
 
-1. **Robust Error Handling**: No more crashes when OCR fails
-2. **Better User Experience**: Clear feedback when OCR is unavailable
-3. **Flexible Deployment**: Works with or without Google Vision API
-4. **Enhanced Parsing**: Better extraction of receipt data
-5. **Multi-format Support**: Handles various receipt formats and currencies
+1. **Robust Error Handling**: No more decoder errors, proper HTTP status codes
+2. **Clear Requirements**: OCR requires Google Vision API configuration
+3. **Enhanced Parsing**: Better extraction of receipt data
+4. **Multi-format Support**: Handles various receipt formats and currencies
+5. **Proper Validation**: Base64 format validation prevents API errors
 
-The OCR functionality is now production-ready and will handle edge cases gracefully! 
+The OCR functionality now works reliably when properly configured! 

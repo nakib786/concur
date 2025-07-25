@@ -163,51 +163,34 @@ export async function POST(request: NextRequest) {
 
     console.log('Processing image with base64 length:', cleanBase64.length)
 
-    try {
-      // Use Google Vision API - fail if not properly configured
-      const data = await processImageWithVision(cleanBase64)
-      
-      const textAnnotations = data.responses[0]?.textAnnotations
+    // Use Google Vision API - fail if not properly configured
+    const data = await processImageWithVision(cleanBase64)
+    
+    const textAnnotations = data.responses[0]?.textAnnotations
 
-      if (!textAnnotations || textAnnotations.length === 0) {
-        return NextResponse.json({ 
-          vendor: '',
-          amount: null,
-          date: '',
-          text: '',
-          items: [],
-          suggestedCategory: 'Other',
-          confidence: 0,
-          success: true 
-        })
-      }
-
-      const fullText = textAnnotations[0].description
-      
-      // Extract information using enhanced parsing
-      const extractedData = extractReceiptInfo(fullText)
-
-      return NextResponse.json({
-        ...extractedData,
-        text: fullText,
-        success: true,
-      })
-    } catch (visionError) {
-      console.error('Google Vision API error:', visionError)
-      
-      // Return a fallback response when Vision API fails
+    if (!textAnnotations || textAnnotations.length === 0) {
       return NextResponse.json({ 
-        vendor: 'Manual Entry Required',
+        vendor: '',
         amount: null,
-        date: new Date().toISOString().split('T')[0],
-        text: 'OCR service unavailable. Please enter receipt details manually.',
+        date: '',
+        text: '',
         items: [],
         suggestedCategory: 'Other',
         confidence: 0,
-        success: true,
-        warning: 'OCR processing unavailable - Google Vision API not configured or failed'
+        success: true 
       })
     }
+
+    const fullText = textAnnotations[0].description
+    
+    // Extract information using enhanced parsing
+    const extractedData = extractReceiptInfo(fullText)
+
+    return NextResponse.json({
+      ...extractedData,
+      text: fullText,
+      success: true,
+    })
   } catch (error) {
     console.error('OCR processing error:', error)
     
