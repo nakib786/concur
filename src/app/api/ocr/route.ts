@@ -135,25 +135,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid base64 format' }, { status: 400 })
     }
 
-    // Try to use Google Vision API
-    let data
-    try {
-      data = await processImageWithVision(image)
-    } catch (visionError) {
-      console.warn('Google Vision API not available:', visionError)
-      // Return a basic response when Vision API is not available
-      return NextResponse.json({
-        vendor: '',
-        amount: null,
-        date: '',
-        text: 'OCR processing not available - Google Vision API credentials not configured',
-        items: [],
-        suggestedCategory: 'Other',
-        confidence: 0,
-        success: true,
-        warning: 'OCR processing unavailable - please configure Google Vision API credentials'
-      })
-    }
+    // Use Google Vision API - fail if not properly configured
+    const data = await processImageWithVision(image)
     
     const textAnnotations = data.responses[0]?.textAnnotations
 

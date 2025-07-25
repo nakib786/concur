@@ -34,11 +34,8 @@ function initializeAuth(): GoogleAuth {
     return auth
   }
 
-  // Use default credentials (for Google Cloud environments)
-  auth = new GoogleAuth({
-    scopes: ['https://www.googleapis.com/auth/cloud-vision'],
-  })
-  return auth
+  // If no credentials are available, throw an error
+  throw new Error('Google Vision API credentials not configured. Please set up service account file or environment variables (GOOGLE_CLOUD_PROJECT_ID, GOOGLE_CLOUD_PRIVATE_KEY, GOOGLE_CLOUD_CLIENT_EMAIL).')
 }
 
 export async function processImageWithVision(imageBase64: string): Promise<any> {
