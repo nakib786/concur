@@ -18,6 +18,7 @@ export default function SignupPage() {
   const [companyName, setCompanyName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [lastAttempt, setLastAttempt] = useState<number>(0)
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
@@ -47,6 +48,7 @@ export default function SignupPage() {
             role: 'employee', // All new signups are clients/employees
             department: companyName,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
@@ -60,31 +62,33 @@ export default function SignupPage() {
         return
       }
 
-      // If user was created successfully, try to create profile using the API
+      // If user was created successfully
       if (data.user) {
-        try {
-          // Get the session to use for API call
-          const { data: sessionData } = await supabase.auth.getSession()
-          
-          if (sessionData.session) {
-            const response = await fetch('/api/ensure-profile', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${sessionData.session.access_token}`,
-                'Content-Type': 'application/json'
-              }
-            })
+        // Check if email confirmation is required
+        if (!data.session) {
+          // Email confirmation required
+          setError('')
+          setSuccess('Account created successfully! Please check your email and click the confirmation link to complete your registration.')
+          return
+        }
 
-            if (response.ok) {
-              // Profile created successfully, redirect to dashboard
-              router.push('/dashboard')
-            } else {
-              const errorData = await response.text()
-              console.error('Profile creation failed:', errorData)
-              setError('Account created but profile setup failed. Please try logging in.')
+        // If session exists (no email confirmation required), create profile
+        try {
+          const response = await fetch('/api/ensure-profile', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${data.session.access_token}`,
+              'Content-Type': 'application/json'
             }
+          })
+
+          if (response.ok) {
+            // Profile created successfully, redirect to dashboard
+            router.push('/dashboard')
           } else {
-            setError('Account created but authentication failed. Please try logging in.')
+            const errorData = await response.text()
+            console.error('Profile creation failed:', errorData)
+            setError('Account created but profile setup failed. Please try logging in.')
           }
         } catch (profileError) {
           console.error('Profile creation error:', profileError)
@@ -174,6 +178,11 @@ export default function SignupPage() {
             {error && (
               <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
+                {success}
               </div>
             )}
             <Button type="submit" className="w-full" disabled={isLoading}>
