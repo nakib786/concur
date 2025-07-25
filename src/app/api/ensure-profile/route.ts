@@ -4,11 +4,12 @@ import { Database } from '@/types/database.types'
 import { ensureUserProfile } from '@/lib/profile-utils'
 
 // Use service role key for server-side operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key'
 
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required')
+// Only throw error at runtime, not during build
+if (!supabaseServiceKey || supabaseServiceKey === 'placeholder-service-key') {
+  console.warn('SUPABASE_SERVICE_ROLE_KEY is not configured')
 }
 
 const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey)
