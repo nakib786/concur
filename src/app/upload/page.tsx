@@ -473,13 +473,23 @@ export default function UploadPage() {
                 <p className="text-sm font-medium text-blue-900">Auto-process with OCR</p>
                 <p className="text-xs text-blue-700">Automatically extract data from receipts after upload</p>
               </div>
-              <Button
-                variant={autoProcessOCR ? "default" : "outline"}
-                size="sm"
+              {/* Modern Toggle Switch */}
+              <button
+                type="button"
                 onClick={() => setAutoProcessOCR(!autoProcessOCR)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  autoProcessOCR ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+                role="switch"
+                aria-checked={autoProcessOCR}
+                aria-label="Toggle auto-process OCR"
               >
-                {autoProcessOCR ? "Enabled" : "Disabled"}
-              </Button>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out ${
+                    autoProcessOCR ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
             </div>
 
             <div 

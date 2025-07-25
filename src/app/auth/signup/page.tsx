@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { supabase } from '@/lib/supabase'
-import { Receipt } from 'lucide-react'
+import { Receipt, Eye, EyeOff } from 'lucide-react'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -18,14 +18,26 @@ export default function SignupPage() {
   const [companyName, setCompanyName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [lastAttempt, setLastAttempt] = useState<number>(0)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Prevent rapid successive attempts
+    const now = Date.now()
+    if (now - lastAttempt < 3000) { // 3 second cooldown
+      setError('Please wait a moment before trying again.')
+      return
+    }
+    setLastAttempt(now)
+    
     setIsLoading(true)
     setError('')
 
     try {
+      // First, sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -39,29 +51,49 @@ export default function SignupPage() {
       })
 
       if (error) {
-        setError(error.message)
-      } else {
-        // Create profile in the database
-        if (data.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              email: data.user.email!,
-              full_name: fullName,
-              role: 'employee', // All new signups are clients/employees
-              department: companyName,
+        // Handle rate limiting and other errors
+        if (error.message.includes('rate limit') || error.message.includes('429')) {
+          setError('Too many signup attempts. Please wait a few minutes and try again.')
+        } else {
+          setError(error.message)
+        }
+        return
+      }
+
+      // If user was created successfully, try to create profile using the API
+      if (data.user) {
+        try {
+          // Get the session to use for API call
+          const { data: sessionData } = await supabase.auth.getSession()
+          
+          if (sessionData.session) {
+            const response = await fetch('/api/ensure-profile', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${sessionData.session.access_token}`,
+                'Content-Type': 'application/json'
+              }
             })
 
-          if (profileError) {
-            setError('Failed to create user profile')
+            if (response.ok) {
+              // Profile created successfully, redirect to dashboard
+              router.push('/dashboard')
+            } else {
+              const errorData = await response.text()
+              console.error('Profile creation failed:', errorData)
+              setError('Account created but profile setup failed. Please try logging in.')
+            }
           } else {
-            router.push('/dashboard')
+            setError('Account created but authentication failed. Please try logging in.')
           }
+        } catch (profileError) {
+          console.error('Profile creation error:', profileError)
+          setError('Account created but profile setup failed. Please try logging in.')
         }
       }
     } catch (err) {
-      setError('An unexpected error occurred')
+      console.error('Signup error:', err)
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -105,14 +137,28 @@ export default function SignupPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="companyName">Company Name</Label>
