@@ -3,17 +3,43 @@ import path from 'path'
 import fs from 'fs'
 
 // Initialize Google Auth with service account
-const serviceAccountPath = path.join(process.cwd(), 'env/journal-448a1-33f9045e5f96.json')
+// This will be initialized lazily to avoid build-time errors
+let auth: GoogleAuth | null = null
 
-// Validate service account file exists
-if (!fs.existsSync(serviceAccountPath)) {
-  throw new Error(`Google service account file not found at: ${serviceAccountPath}`)
+function initializeAuth(): GoogleAuth {
+  if (auth) return auth
+
+  // Try service account file first (for local development)
+  const serviceAccountPath = path.join(process.cwd(), 'env/journal-448a1-33f9045e5f96.json')
+  
+  if (fs.existsSync(serviceAccountPath)) {
+    auth = new GoogleAuth({
+      keyFilename: serviceAccountPath,
+      scopes: ['https://www.googleapis.com/auth/cloud-vision'],
+    })
+    return auth
+  }
+
+  // Try environment variables (for production)
+  if (process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GOOGLE_CLOUD_PRIVATE_KEY && process.env.GOOGLE_CLOUD_CLIENT_EMAIL) {
+    auth = new GoogleAuth({
+      credentials: {
+        type: 'service_account',
+        project_id: process.env.GOOGLE_CLOUD_PROJECT_ID,
+        private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+      },
+      scopes: ['https://www.googleapis.com/auth/cloud-vision'],
+    })
+    return auth
+  }
+
+  // Use default credentials (for Google Cloud environments)
+  auth = new GoogleAuth({
+    scopes: ['https://www.googleapis.com/auth/cloud-vision'],
+  })
+  return auth
 }
-
-const auth = new GoogleAuth({
-  keyFilename: serviceAccountPath,
-  scopes: ['https://www.googleapis.com/auth/cloud-vision'],
-})
 
 export async function processImageWithVision(imageBase64: string): Promise<any> {
   try {
@@ -22,8 +48,11 @@ export async function processImageWithVision(imageBase64: string): Promise<any> 
     }
 
     console.log('Initializing Google Vision client...')
-    const client = await auth.getClient()
-    const projectId = await auth.getProjectId()
+    
+    // Initialize auth lazily
+    const authInstance = initializeAuth()
+    const client = await authInstance.getClient()
+    const projectId = await authInstance.getProjectId()
     
     console.log('Using project ID:', projectId)
     
