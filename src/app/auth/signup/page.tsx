@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 import { supabase } from '@/lib/supabase'
 import { Receipt } from 'lucide-react'
 
@@ -15,8 +15,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [department, setDepartment] = useState('')
-  const [role, setRole] = useState<'employee' | 'manager' | 'admin'>('employee')
+  const [companyName, setCompanyName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -33,8 +32,8 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: fullName,
-            role,
-            department,
+            role: 'employee', // All new signups are clients/employees
+            department: companyName,
           },
         },
       })
@@ -50,8 +49,8 @@ export default function SignupPage() {
               id: data.user.id,
               email: data.user.email!,
               full_name: fullName,
-              role,
-              department,
+              role: 'employee', // All new signups are clients/employees
+              department: companyName,
             })
 
           if (profileError) {
@@ -75,9 +74,9 @@ export default function SignupPage() {
           <div className="flex justify-center mb-4">
             <Receipt className="h-12 w-12 text-blue-600" />
           </div>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
+          <CardTitle className="text-2xl">Create Client Account</CardTitle>
           <CardDescription>
-            Join ExpenseTracker to manage your expenses
+            Join ExpenseTracker to manage your company expenses
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,27 +115,15 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
+              <Label htmlFor="companyName">Company Name</Label>
               <Input
-                id="department"
+                id="companyName"
                 type="text"
-                placeholder="Enter your department"
-                value={department}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepartment(e.target.value)}
+                placeholder="Enter your company name"
+                value={companyName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyName(e.target.value)}
+                required
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(value: 'employee' | 'manager' | 'admin') => setRole(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="employee">Employee</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             {error && (
               <div className="text-sm text-red-600 bg-red-50 p-3 rounded">

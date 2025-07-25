@@ -66,4 +66,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Responsive utilities for mobile overflow prevention */
+@layer utilities {
+  .mobile-safe {
+    @apply overflow-x-hidden;
+  }
+  
+  .mobile-header {
+    @apply flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4;
+  }
+  
+  .mobile-nav {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center;
+  }
+  
+  .text-truncate-mobile {
+    @apply truncate max-w-[120px] sm:max-w-none;
+  }
 } 

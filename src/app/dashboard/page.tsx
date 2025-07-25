@@ -146,20 +146,20 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mobile-safe">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Receipt className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">ExpenseTracker</span>
+          <div className="mobile-header py-4 sm:py-6">
+            <div className="flex items-center min-w-0">
+              <Receipt className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <span className="ml-2 text-lg sm:text-2xl font-bold text-gray-900 truncate">ExpenseTracker</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+            <div className="mobile-nav">
+              <span className="text-xs sm:text-sm text-gray-600 text-truncate-mobile">
                 Welcome, {user?.user_metadata?.full_name || user?.email}
               </span>
-              <Button variant="outline" onClick={handleSignOut}>
+              <Button variant="outline" onClick={handleSignOut} size="sm" className="flex-shrink-0">
                 Sign Out
               </Button>
             </div>

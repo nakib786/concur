@@ -232,21 +232,22 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mobile-safe">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-4">
+          <div className="mobile-header py-4 sm:py-6">
+            <div className="flex items-center min-w-0">
+              <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-2 sm:mr-4 p-2 flex-shrink-0">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <FileText className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">Expense Reports</span>
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <span className="ml-2 text-lg sm:text-2xl font-bold text-gray-900 truncate">Expense Reports</span>
             </div>
-            <Button onClick={() => setShowCreateForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Report
+            <Button onClick={() => setShowCreateForm(true)} size="sm" className="flex-shrink-0">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Create Report</span>
+              <span className="sm:hidden">Create</span>
             </Button>
           </div>
         </div>
@@ -356,8 +357,8 @@ export default function ReportsPage() {
 
         {/* Create Report Modal */}
         {showCreateForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="bg-white rounded-lg max-w-sm sm:max-w-2xl lg:max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-auto">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-2xl font-bold">Create Expense Report</h2>
@@ -461,8 +462,8 @@ export default function ReportsPage() {
 
         {/* View Report Modal */}
         {selectedReport && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="bg-white rounded-lg max-w-sm sm:max-w-2xl lg:max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-auto">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-2xl font-bold">Report Details</h2>

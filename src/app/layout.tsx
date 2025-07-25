@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'SAP Concur Clone - Expense Management',
   description: 'Modern expense management application with OCR receipt processing',
+  viewport: 'width=device-width, initial-scale=1',
 }
 
 export default function RootLayout({

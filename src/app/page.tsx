@@ -5,21 +5,21 @@ import { Receipt, Users, BarChart3, Shield } from 'lucide-react'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 mobile-safe">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Receipt className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">ExpenseTracker</span>
+          <div className="mobile-header py-4 sm:py-6">
+            <div className="flex items-center min-w-0">
+              <Receipt className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <span className="ml-2 text-lg sm:text-2xl font-bold text-gray-900 truncate">ExpenseTracker</span>
             </div>
-            <div className="flex space-x-4">
+            <div className="mobile-nav">
               <Link href="/auth/login">
-                <Button variant="outline">Sign In</Button>
+                <Button variant="outline" size="sm">Sign In</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button>Get Started</Button>
+                <Button size="sm">Get Started</Button>
               </Link>
             </div>
           </div>

@@ -30,7 +30,7 @@ export async function ensureUserProfile(userId: string, userEmail: string, userM
           id: userId,
           email: userEmail,
           full_name: userMetadata?.full_name || null,
-          role: (userMetadata?.role as 'employee' | 'manager' | 'admin') || 'employee',
+          role: (userMetadata?.role as 'employee' | 'admin') || 'employee',
           department: userMetadata?.department || null,
         })
 

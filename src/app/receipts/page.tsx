@@ -223,28 +223,30 @@ export default function ReceiptsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mobile-safe">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-4">
+          <div className="mobile-header py-4 sm:py-6">
+            <div className="flex items-center min-w-0">
+              <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mr-2 sm:mr-4 p-2 flex-shrink-0">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <Receipt className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">My Receipts</span>
+              <Receipt className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <span className="ml-2 text-lg sm:text-2xl font-bold text-gray-900 truncate">My Receipts</span>
             </div>
-            <div className="flex space-x-2">
+            <div className="mobile-nav">
               {userProfile?.role === 'admin' && (
-                <Button variant="outline" onClick={() => router.push('/receipts/pending')}>
-                  <Clock className="h-4 w-4 mr-2" />
-                  Pending Approval
+                <Button variant="outline" onClick={() => router.push('/receipts/pending')} size="sm">
+                  <Clock className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Pending Approval</span>
+                  <span className="sm:hidden">Pending</span>
                 </Button>
               )}
-              <Button variant="outline" onClick={() => router.push('/receipts/archived')}>
-                <Archive className="h-4 w-4 mr-2" />
-                Archived Receipts
+              <Button variant="outline" onClick={() => router.push('/receipts/archived')} size="sm">
+                <Archive className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Archived Receipts</span>
+                <span className="sm:hidden">Archived</span>
               </Button>
             </div>
           </div>
@@ -375,8 +377,8 @@ export default function ReceiptsPage() {
 
         {/* Receipt Detail Modal */}
         {selectedReceipt && !isEditing && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="bg-white rounded-lg max-w-sm sm:max-w-2xl lg:max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-auto">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-2xl font-bold">Receipt Details</h2>
@@ -473,8 +475,8 @@ export default function ReceiptsPage() {
 
         {/* Edit Receipt Modal */}
         {isEditing && selectedReceipt && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="bg-white rounded-lg max-w-sm sm:max-w-lg lg:max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-auto">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-2xl font-bold">Edit Receipt</h2>
@@ -559,8 +561,8 @@ export default function ReceiptsPage() {
 
         {/* Delete Confirmation Modal */}
         {deleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-auto p-6">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="bg-white rounded-lg max-w-xs sm:max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-auto p-4 sm:p-6">
               <div className="flex justify-center items-center mb-4 text-red-500">
                 <AlertTriangle className="h-12 w-12" />
               </div>

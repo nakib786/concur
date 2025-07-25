@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { supabase } from '@/lib/supabase'
-import { Upload, FileImage, Loader2, Copy, Download, X, Plus, Check, AlertCircle, Tag, Zap } from 'lucide-react'
+import { Upload, FileImage, Loader2, Copy, Download, X, Plus, Check, AlertCircle, Tag, Zap, Camera } from 'lucide-react'
 
 interface LineItem {
   description: string
@@ -50,6 +50,7 @@ export default function UploadPage() {
   const [isSavingAll, setIsSavingAll] = useState(false)
   const [autoProcessOCR, setAutoProcessOCR] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const dropZoneRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
@@ -143,6 +144,20 @@ export default function UploadPage() {
       console.log('File select - autoProcessOCR:', autoProcessOCR)
       const receiptIds = await processFiles(files)
       console.log('File select - received receipt IDs:', receiptIds)
+    }
+  }
+
+  // Handle camera capture
+  const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      console.log('Camera capture - autoProcessOCR:', autoProcessOCR)
+      const receiptIds = await processFiles(files)
+      console.log('Camera capture - received receipt IDs:', receiptIds)
+    }
+    // Reset the input so the same file can be selected again
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = ''
     }
   }
 
@@ -435,11 +450,11 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 mobile-safe">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Upload Receipts</h1>
-          <p className="mt-2 text-gray-600">Upload multiple receipts with automatic itemization and category detection</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Upload Receipts</h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Upload multiple receipts with automatic itemization and category detection</p>
         </div>
 
         {/* Upload Zone */}
@@ -447,7 +462,7 @@ export default function UploadPage() {
           <CardHeader>
             <CardTitle>Upload Multiple Receipts</CardTitle>
             <CardDescription>
-              Drag & drop, paste, or select multiple receipt images (JPG, PNG, PDF)
+              Drag & drop, paste, select files, or take photos of multiple receipt images (JPG, PNG, PDF)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -495,14 +510,28 @@ export default function UploadPage() {
                       <Copy className="h-4 w-4" />
                       or paste from clipboard (Ctrl+V)
                     </p>
-                    <div className="pt-4">
-                      <Button 
-                        onClick={() => fileInputRef.current?.click()}
-                        size="lg"
-                      >
-                        <Upload className="h-5 w-5 mr-2" />
-                        Browse Files
-                      </Button>
+                    <div className="pt-4 space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button 
+                          onClick={() => fileInputRef.current?.click()}
+                          size="lg"
+                        >
+                          <Upload className="h-5 w-5 mr-2" />
+                          Browse Files
+                        </Button>
+                        <Button 
+                          onClick={() => cameraInputRef.current?.click()}
+                          size="lg"
+                          variant="outline"
+                          className="sm:hidden" // Only show on mobile
+                        >
+                          <Camera className="h-5 w-5 mr-2" />
+                          Take Photo
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-400 sm:hidden">
+                        Use "Take Photo" to capture receipts with your camera
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -513,6 +542,14 @@ export default function UploadPage() {
                 accept="image/*,.pdf"
                 multiple
                 onChange={handleFileSelect}
+                className="hidden"
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleCameraCapture}
                 className="hidden"
               />
             </div>
