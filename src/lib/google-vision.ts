@@ -45,6 +45,19 @@ export async function processImageWithVision(imageBase64: string): Promise<any> 
     }
 
     console.log('Initializing Google Vision client...')
+    console.log('Base64 image length:', imageBase64.length)
+    
+    // Validate base64 format before sending to API
+    try {
+      // Test if we can decode the base64 string
+      const buffer = Buffer.from(imageBase64, 'base64')
+      if (buffer.length === 0) {
+        throw new Error('Invalid base64 data - decoded to empty buffer')
+      }
+      console.log('Base64 validation passed, decoded buffer size:', buffer.length)
+    } catch (decodeError) {
+      throw new Error(`Invalid base64 format: ${decodeError}`)
+    }
     
     // Initialize auth lazily
     const authInstance = initializeAuth()

@@ -129,40 +129,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Image must be a base64 string' }, { status: 400 })
     }
 
-    // Validate base64 format
+    // Clean the base64 string - remove data URL prefix if present
+    let cleanBase64 = image
+    if (image.startsWith('data:')) {
+      const commaIndex = image.indexOf(',')
+      if (commaIndex !== -1) {
+        cleanBase64 = image.substring(commaIndex + 1)
+      }
+    }
+
+    // Remove any whitespace or newlines
+    cleanBase64 = cleanBase64.replace(/\s/g, '')
+
+    // Validate base64 format after cleaning
     const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
-    if (!base64Regex.test(image)) {
+    if (!base64Regex.test(cleanBase64)) {
       return NextResponse.json({ error: 'Invalid base64 format' }, { status: 400 })
     }
 
-    // Use Google Vision API - fail if not properly configured
-    const data = await processImageWithVision(image)
-    
-    const textAnnotations = data.responses[0]?.textAnnotations
+    // Validate base64 length (should be multiple of 4)
+    if (cleanBase64.length % 4 !== 0) {
+      return NextResponse.json({ error: 'Invalid base64 padding' }, { status: 400 })
+    }
 
-    if (!textAnnotations || textAnnotations.length === 0) {
+    // Basic size validation (prevent extremely large or small images)
+    if (cleanBase64.length < 100) {
+      return NextResponse.json({ error: 'Image data too small' }, { status: 400 })
+    }
+
+    if (cleanBase64.length > 10 * 1024 * 1024) { // 10MB limit
+      return NextResponse.json({ error: 'Image data too large (max 10MB)' }, { status: 400 })
+    }
+
+    console.log('Processing image with base64 length:', cleanBase64.length)
+
+    try {
+      // Use Google Vision API - fail if not properly configured
+      const data = await processImageWithVision(cleanBase64)
+      
+      const textAnnotations = data.responses[0]?.textAnnotations
+
+      if (!textAnnotations || textAnnotations.length === 0) {
+        return NextResponse.json({ 
+          vendor: '',
+          amount: null,
+          date: '',
+          text: '',
+          items: [],
+          suggestedCategory: 'Other',
+          confidence: 0,
+          success: true 
+        })
+      }
+
+      const fullText = textAnnotations[0].description
+      
+      // Extract information using enhanced parsing
+      const extractedData = extractReceiptInfo(fullText)
+
+      return NextResponse.json({
+        ...extractedData,
+        text: fullText,
+        success: true,
+      })
+    } catch (visionError) {
+      console.error('Google Vision API error:', visionError)
+      
+      // Return a fallback response when Vision API fails
       return NextResponse.json({ 
-        vendor: '',
+        vendor: 'Manual Entry Required',
         amount: null,
-        date: '',
-        text: '',
+        date: new Date().toISOString().split('T')[0],
+        text: 'OCR service unavailable. Please enter receipt details manually.',
         items: [],
         suggestedCategory: 'Other',
         confidence: 0,
-        success: true 
+        success: true,
+        warning: 'OCR processing unavailable - Google Vision API not configured or failed'
       })
     }
-
-    const fullText = textAnnotations[0].description
-    
-    // Extract information using enhanced parsing
-    const extractedData = extractReceiptInfo(fullText)
-
-    return NextResponse.json({
-      ...extractedData,
-      text: fullText,
-      success: true,
-    })
   } catch (error) {
     console.error('OCR processing error:', error)
     
