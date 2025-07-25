@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# ExpenseTracker - Receipt Management System
+Sitemap: /sitemap.xml 
