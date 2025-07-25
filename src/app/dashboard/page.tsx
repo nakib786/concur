@@ -175,7 +175,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${userProfile?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-6 mb-8`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${userProfile?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-2'} gap-6 mb-8`}>
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/upload')}>
             <CardHeader className="text-center">
               <Plus className="h-12 w-12 text-blue-600 mx-auto" />
@@ -184,18 +184,6 @@ export default function DashboardPage() {
             <CardContent>
               <CardDescription className="text-center">
                 Upload and process new receipts with OCR
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/reports')}>
-            <CardHeader className="text-center">
-              <FileText className="h-12 w-12 text-green-600 mx-auto" />
-              <CardTitle>Expense Reports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-center">
-                Create and manage expense reports
               </CardDescription>
             </CardContent>
           </Card>
@@ -212,31 +200,45 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="text-center">
-              <BarChart3 className="h-12 w-12 text-orange-600 mx-auto" />
-              <CardTitle>Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-center">
-                View expense trends and reports
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          {/* Admin Only - Pending Receipts */}
+          {/* Admin Only Cards */}
           {userProfile?.role === 'admin' && (
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/receipts/pending')}>
-              <CardHeader className="text-center">
-                <Clock className="h-12 w-12 text-yellow-600 mx-auto" />
-                <CardTitle>Pending Approval</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-center">
-                  Review and approve receipts
-                </CardDescription>
-              </CardContent>
-            </Card>
+            <>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/reports')}>
+                <CardHeader className="text-center">
+                  <FileText className="h-12 w-12 text-green-600 mx-auto" />
+                  <CardTitle>Expense Reports</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-center">
+                    Create and manage expense reports
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="text-center">
+                  <BarChart3 className="h-12 w-12 text-orange-600 mx-auto" />
+                  <CardTitle>Analytics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-center">
+                    View expense trends and reports
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/receipts/pending')}>
+                <CardHeader className="text-center">
+                  <Clock className="h-12 w-12 text-yellow-600 mx-auto" />
+                  <CardTitle>Pending Approval</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-center">
+                    Review and approve receipts
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </>
           )}
         </div>
 

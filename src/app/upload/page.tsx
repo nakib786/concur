@@ -54,6 +54,48 @@ export default function UploadPage() {
   const dropZoneRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
+  // Image compression function
+  const compressImage = (file: File, maxWidth: number = 1920, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height)
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              })
+              resolve(compressedFile)
+            } else {
+              resolve(file) // Fallback to original file
+            }
+          },
+          'image/jpeg',
+          quality
+        )
+      }
+      
+      img.onerror = () => resolve(file) // Fallback to original file
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   // File validation
   const validateFile = (file: File): boolean => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
@@ -147,12 +189,26 @@ export default function UploadPage() {
     }
   }
 
-  // Handle camera capture
+  // Handle camera capture with compression
   const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
       console.log('Camera capture - autoProcessOCR:', autoProcessOCR)
-      const receiptIds = await processFiles(files)
+      
+      // Compress camera images to prevent 413 errors
+      const compressedFiles: File[] = []
+      for (const file of Array.from(files)) {
+        if (file.type.startsWith('image/')) {
+          console.log(`Compressing camera image: ${file.name}, original size: ${(file.size / 1024 / 1024).toFixed(2)}MB`)
+          const compressed = await compressImage(file, 1920, 0.8)
+          console.log(`Compressed size: ${(compressed.size / 1024 / 1024).toFixed(2)}MB`)
+          compressedFiles.push(compressed)
+        } else {
+          compressedFiles.push(file)
+        }
+      }
+      
+      const receiptIds = await processFiles(compressedFiles)
       console.log('Camera capture - received receipt IDs:', receiptIds)
     }
     // Reset the input so the same file can be selected again
