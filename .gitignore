@@ -25,6 +25,10 @@ yarn-error.log*
 # Local env files
 .env*.local
 
+# Google Cloud credentials
+env/journal-*.json
+env/key
+
 # Vercel
 .vercel
 
